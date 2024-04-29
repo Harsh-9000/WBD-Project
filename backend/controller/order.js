@@ -1,3 +1,9 @@
+/**
+ * @swagger
+ * tags:
+ *   name: Order
+ *   description: Order management APIs
+ */
 import express from "express";
 import ErrorHandler from "../utils/ErrorHandler.js";
 import catchAsyncErrors from "../middleware/catchAsyncErrors.js";
@@ -7,6 +13,57 @@ import Order from "../model/order.js";
 import Shop from "../model/shop.js";
 
 const router = express.Router();
+
+/**
+ * @swagger
+ * /api/v2/order/create-order:
+ *   post:
+ *     summary: Create an order
+ *     description: Create an order with items from the cart grouped by shop, and calculate the total price for each shop.
+ *     tags: [Order]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               cart:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   description: Cart items
+ *               shippingAddress:
+ *                 type: object
+ *                 description: Shipping address
+ *               user:
+ *                 type: string
+ *                 description: User ID
+ *               totalPrice:
+ *                 type: number
+ *                 description: Total price of the order
+ *               paymentInfo:
+ *                 type: object
+ *                 description: Payment information
+ *     responses:
+ *       '201':
+ *         description: Successfully created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 orders:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     description: Order details
+ *       '500':
+ *         description: Internal server error
+ */
 
 // create new order
 router.post(
@@ -55,6 +112,40 @@ router.post(
     })
   );
 
+/**
+* @swagger
+* /api/v2/order/get-all-orders/{userId}:
+*   get:
+*     summary: Get all orders for a user
+*     description: Retrieve all orders associated with a specific user.
+*     tags: [Order]
+*     parameters:
+*       - in: path
+*         name: userId
+*         required: true
+*         description: ID of the user whose orders are to be retrieved
+*         schema:
+*           type: string
+*     responses:
+*       '200':
+*         description: Successfully retrieved
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 success:
+*                   type: boolean
+*                   description: Indicates if the request was successful
+*                 orders:
+*                   type: array
+*                   items:
+*                     type: object
+*                     description: Order details
+*       '500':
+*         description: Internal server error
+*/
+
   // get all orders of user
 router.get(
   "/get-all-orders/:userId",
@@ -73,6 +164,40 @@ router.get(
     }
   })
 );
+
+/**
+ * @swagger
+ * /api/v2/order/get-seller-all-orders/{shopId}:
+ *   get:
+ *     summary: Get all orders for a seller
+ *     description: Retrieve all orders associated with a specific seller's shop.
+ *     tags: [Order]
+ *     parameters:
+ *       - in: path
+ *         name: shopId
+ *         required: true
+ *         description: ID of the shop whose orders are to be retrieved
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully retrieved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 orders:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     description: Order details
+ *       '500':
+ *         description: Internal server error
+ */
 
 // get all orders of seller
 router.get(
@@ -94,6 +219,56 @@ router.get(
     }
   })
 );
+
+/**
+ * @swagger
+ * /api/v2/order/update-order-status/{id}:
+ *   put:
+ *     summary: Update order status
+ *     description: Update the status of a specific order identified by its ID.
+ *     tags: [Order]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the order to be updated
+ *         schema:
+ *           type: string
+ *       - in: header
+ *         name: Authorization
+ *         description: JWT authorization header
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 description: New status of the order
+ *           example:
+ *             status: Delivered
+ *     responses:
+ *       '200':
+ *         description: Successfully updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 order:
+ *                   type: object
+ *                   description: Updated order details
+ *       '500':
+ *         description: Internal server error
+ */
 
 // update order status for seller
 router.put(
@@ -150,6 +325,59 @@ router.put(
   })
 );
 
+/**
+ * @swagger
+ * /api/v2/order/order-refund/{id}:
+ *   put:
+ *     summary: Request order refund
+ *     description: Request a refund for a specific order identified by its ID.
+ *     tags: [Order]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the order to be refunded
+ *         schema:
+ *           type: string
+ *       - in: header
+ *         name: Authorization
+ *         description: JWT authorization header
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 description: New status of the order (e.g., "Refund Requested")
+ *           example:
+ *             status: Refund Requested
+ *     responses:
+ *       '200':
+ *         description: Successfully requested order refund
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 order:
+ *                   type: object
+ *                   description: Updated order details
+ *                 message:
+ *                   type: string
+ *                   description: Confirmation message
+ *       '500':
+ *         description: Internal server error
+ */
+
 // give a refund ----- user
 router.put(
   "/order-refund/:id",
@@ -175,6 +403,56 @@ router.put(
     }
   })
 );
+
+/**
+ * @swagger
+ * /api/v2/order/order-refund-success/{id}:
+ *   put:
+ *     summary: Confirm order refund success
+ *     description: Confirm that the refund for a specific order identified by its ID was successful.
+ *     tags: [Order]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the order for which the refund was successful
+ *         schema:
+ *           type: string
+ *       - in: header
+ *         name: Authorization
+ *         description: JWT authorization header
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 description: New status of the order (e.g., "Refund Success")
+ *           example:
+ *             status: Refund Success
+ *     responses:
+ *       '200':
+ *         description: Successfully confirmed order refund success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 message:
+ *                   type: string
+ *                   description: Confirmation message
+ *       '500':
+ *         description: Internal server error
+ */
 
 // accept the refund ---- seller
 router.put(
@@ -218,6 +496,38 @@ router.put(
   })
 );
 
+/**
+ * @swagger
+ * /api/v2/order/admin-all-orders:
+ *   get:
+ *     summary: Get all orders (admin)
+ *     description: Retrieve all orders in the system. Only accessible to admins.
+ *     tags: [Order]
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         description: JWT authorization header
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '201':
+ *         description: Successfully retrieved all orders
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 orders:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Order'
+ *       '500':
+ *         description: Internal server error
+ */
 // all orders --- for admin
 router.get(
   "/admin-all-orders",

@@ -1,3 +1,10 @@
+/**
+ * @swagger
+ * tags:
+ *   name: User
+ *   description: User management APIs
+ */
+
 import express from 'express';
 import User from '../model/user.js';
 import { upload } from '../multer.js';
@@ -11,6 +18,41 @@ import sendToken from '../utils/jwtToken.js';
 import { isAdmin, isAuthenticated } from '../middleware/auth.js';
 
 const router = express.Router();
+
+/**
+ * @swagger
+ * /api/v2/user/create-user:
+ *   post:
+ *     summary: Create a new user
+ *     description: Register a new user with name, email, password, and avatar.
+ *     tags: [User]
+ *     consumes:
+ *       - multipart/form-data
+ *     parameters:
+ *       - in: formData
+ *         name: file
+ *         type: file
+ *         description: The avatar image file to upload
+ *       - in: formData
+ *         name: name
+ *         type: string
+ *         description: User's name
+ *       - in: formData
+ *         name: email
+ *         type: string
+ *         description: User's email
+ *       - in: formData
+ *         name: password
+ *         type: string
+ *         description: User's password
+ *     responses:
+ *       '201':
+ *         description: User created successfully
+ *       '400':
+ *         description: Bad request or user already exists
+ *       '500':
+ *         description: Internal server error
+ */
 
 // create user
 router.post('/create-user', upload.single('file'), async (req, res, next) => {
@@ -104,6 +146,35 @@ router.post(
   })
 );
 
+/**
+ * @swagger
+ * /api/v2/user/login-user:
+ *   post:
+ *     summary: Log in user
+ *     description: Log in user with email and password.
+ *     tags: [User]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: User's email
+ *               password:
+ *                 type: string
+ *                 description: User's password
+ *     responses:
+ *       '201':
+ *         description: User logged in successfully
+ *       '400':
+ *         description: Bad request or user doesn't exist or incorrect password
+ *       '500':
+ *         description: Internal server error
+ */
+
 // login user
 router.post(
   '/login-user',
@@ -136,6 +207,34 @@ router.post(
   })
 );
 
+/**
+ * @swagger
+ * /api/v2/user/getuser:
+ *   get:
+ *     summary: Get user information
+ *     description: Retrieve user information by user ID.
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: User information retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       '400':
+ *         description: Bad request or user doesn't exist
+ *       '500':
+ *         description: Internal server error
+ */
+
 // load user
 router.get(
   '/getuser',
@@ -158,6 +257,31 @@ router.get(
   })
 );
 
+/**
+ * @swagger
+ * /api/v2/user/logout:
+ *   get:
+ *     summary: Log out user
+ *     description: Log out the currently authenticated user by clearing the authentication token.
+ *     tags: [User]
+ *     responses:
+ *       '201':
+ *         description: User logged out successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 message:
+ *                   type: string
+ *                   description: Log out message
+ *       '500':
+ *         description: Internal server error
+ */
+
 // log out user
 router.get(
   '/logout',
@@ -176,6 +300,53 @@ router.get(
     }
   })
 );
+
+/**
+ * @swagger
+ * /api/v2/user/update-user-info:
+ *   put:
+ *     summary: Update user information
+ *     description: Update user information such as name, email, password, and phone number.
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: User's email
+ *               password:
+ *                 type: string
+ *                 description: User's password
+ *               name:
+ *                 type: string
+ *                 description: User's name
+ *               phoneNumber:
+ *                 type: string
+ *                 description: User's phone number
+ *     responses:
+ *       '201':
+ *         description: User information updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       '400':
+ *         description: Bad request or user not found or incorrect password
+ *       '500':
+ *         description: Internal server error
+ */
 
 // update user info
 router.put(
@@ -215,6 +386,43 @@ router.put(
   })
 );
 
+/**
+ * @swagger
+ * /api/v2/user/update-avatar:
+ *   put:
+ *     summary: Update user avatar
+ *     description: Update the avatar image of the authenticated user.
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: The avatar image file to upload
+ *     responses:
+ *       '200':
+ *         description: Avatar updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       '500':
+ *         description: Internal server error
+ */
+
 // update user avatar
 router.put(
   '/update-avatar',
@@ -243,6 +451,45 @@ router.put(
     }
   })
 );
+
+/**
+ * @swagger
+ * /api/v2/user/update-user-addresses:
+ *   put:
+ *     summary: Update user addresses
+ *     description: Update user addresses by adding a new address or modifying an existing one.
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               _id:
+ *                 type: string
+ *                 description: ID of the address to update (optional, if updating an existing address)
+ *               addressType:
+ *                 type: string
+ *                 description: Type of the address (e.g., home, work)
+ *     responses:
+ *       '200':
+ *         description: User addresses updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       '500':
+ *         description: Internal server error
+ */
 
 // update user addresses
 router.put(
@@ -283,6 +530,39 @@ router.put(
   })
 );
 
+/**
+ * @swagger
+ * /api/v2/user/delete-user-address/{id}:
+ *   delete:
+ *     summary: Delete user address
+ *     description: Delete a specific address of the authenticated user by its ID.
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the address to delete
+ *     responses:
+ *       '200':
+ *         description: User address deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       '500':
+ *         description: Internal server error
+ */
+
 // delete user address
 router.delete(
   '/delete-user-address/:id',
@@ -309,6 +589,51 @@ router.delete(
     }
   })
 );
+
+/**
+ * @swagger
+ * /api/v2/user/update-user-password:
+ *   put:
+ *     summary: Update user password
+ *     description: Update the password of the authenticated user.
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *                 description: The user's current password
+ *               newPassword:
+ *                 type: string
+ *                 description: The user's new password
+ *               confirmPassword:
+ *                 type: string
+ *                 description: Confirmation of the new password
+ *     responses:
+ *       '200':
+ *         description: Password updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 message:
+ *                   type: string
+ *                   description: Success message
+ *       '400':
+ *         description: Bad request or old password is incorrect or passwords do not match
+ *       '500':
+ *         description: Internal server error
+ */
 
 // update user password
 router.put(
@@ -345,6 +670,37 @@ router.put(
   })
 );
 
+/**
+ * @swagger
+ * /api/v2/user/user-info/{id}:
+ *   get:
+ *     summary: Get user information by ID
+ *     description: Retrieve user information by user ID.
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the user to retrieve information
+ *     responses:
+ *       '201':
+ *         description: User information retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       '500':
+ *         description: Internal server error
+ */
+
 // find user infoormation with the userId
 router.get(
   '/user-info/:id',
@@ -361,6 +717,34 @@ router.get(
     }
   })
 );
+
+/**
+ * @swagger
+ * /api/v2/user/admin-all-users:
+ *   get:
+ *     summary: Get all users (Admin only)
+ *     description: Retrieve all users excluding the admin users.
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '201':
+ *         description: Users retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 users:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/User'
+ *       '500':
+ *         description: Internal server error
+ */
 
 // all users --- for admin
 router.get(
@@ -381,6 +765,42 @@ router.get(
     }
   })
 );
+
+/**
+ * @swagger
+ * /api/v2/user/delete-user/{id}:
+ *   delete:
+ *     summary: Delete user by ID (Admin only)
+ *     description: Delete a user by their ID. This operation is restricted to administrators only.
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the user to delete
+ *     responses:
+ *       '201':
+ *         description: User deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 message:
+ *                   type: string
+ *                   description: Success message
+ *       '400':
+ *         description: Bad request or user not found
+ *       '500':
+ *         description: Internal server error
+ */
 
 // delete users --- admin
 router.delete(

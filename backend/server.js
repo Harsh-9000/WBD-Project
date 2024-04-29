@@ -15,6 +15,8 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
   });
 }
 
+dotenv.config()
+
 // connect db
 connectDatabase();
 

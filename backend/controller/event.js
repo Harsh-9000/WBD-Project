@@ -1,3 +1,9 @@
+/**
+ * @swagger
+ * tags:
+ *   name: Event
+ *   description: Event management APIs
+ */
 import express from "express";
 import { upload } from "../multer.js";
 import ErrorHandler from "../utils/ErrorHandler.js";
@@ -8,6 +14,51 @@ import Shop from "../model/shop.js";
 import Event from "../model/event.js";
 
 const router = express.Router();
+
+/**
+ * @swagger
+ * /api/v2/event/create-event:
+ *   post:
+ *     summary: Create a new event
+ *     description: Create a new event in the system. Images can be uploaded along with the event creation.
+ *     tags: [Event]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               shopId:
+ *                 type: string
+ *                 description: The ID of the shop where the event is associated.
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: Images related to the event
+ *               OtherEventData:
+ *                 type: string
+ *                 description: Other data related to the event
+ *     responses:
+ *       '201':
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 event:
+ *                   $ref: '#/components/schemas/Event'
+ *       '400':
+ *         description: Bad request
+ *       '500':
+ *         description: Internal server error
+ */
 
 // create event
 router.post(
@@ -40,6 +91,34 @@ router.post(
   })
 );
 
+/**
+ * @swagger
+ * /api/v2/event/get-all-events:
+ *   get:
+ *     summary: Get all events
+ *     description: Retrieve all events available in the system.
+ *     tags: [Event]
+ *     responses:
+ *       '201':
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 events:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Event'
+ *       '400':
+ *         description: Bad request
+ *       '500':
+ *         description: Internal server error
+ */
+
 // get all events
 router.get("/get-all-events", async (req, res, next) => {
   try {
@@ -52,6 +131,41 @@ router.get("/get-all-events", async (req, res, next) => {
     return next(new ErrorHandler(error, 400));
   }
 });
+
+/**
+ * @swagger
+ * /api/v2/event/get-all-events/{id}:
+ *   get:
+ *     summary: Get all events by shop ID
+ *     description: Retrieve all events associated with a specific shop ID.
+ *     tags: [Event]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Shop ID to retrieve events for
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '201':
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 events:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Event'
+ *       '400':
+ *         description: Bad request
+ *       '500':
+ *         description: Internal server error
+ */
 
 // get all events of a shop
 router.get(
@@ -69,6 +183,40 @@ router.get(
     }
   })
 );
+
+/**
+ * @swagger
+ * /api/v2/event/delete-shop-event/{id}:
+ *   delete:
+ *     summary: Delete a shop event by ID
+ *     description: Delete a shop event by its ID.
+ *     tags: [Event]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the event to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '201':
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 message:
+ *                   type: string
+ *                   description: Message indicating the success of the operation
+ *       '400':
+ *         description: Bad request
+ *       '500':
+ *         description: Internal server error
+ */
 
 // delete event of a shop
 router.delete(
@@ -105,6 +253,34 @@ router.delete(
     }
   })
 );
+
+/**
+ * @swagger
+ * /api/v2/event/admin-all-events:
+ *   get:
+ *     summary: Get all events (admin only)
+ *     description: Retrieve all events, accessible only to admin users.
+ *     tags: [Event]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '201':
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 events:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Event'
+ *       '500':
+ *         description: Internal server error
+ */
 
 // all events --- for admin
 router.get(

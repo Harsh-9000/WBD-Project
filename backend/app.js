@@ -8,8 +8,31 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import path from 'path';
 import { fileURLToPath } from "url";
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
 
 const app = express();
+
+const options = {
+  swaggerDefinition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Azura Cart API',
+      version: '1.0.0',
+      description: 'Documentation for Azura Cart API',
+    },
+    servers: [
+      {
+        url: 'http://localhost:8000',
+        description: 'Development server',
+      },
+    ],
+  },
+  apis: ['swagger-spec.js', 'controller/user.js', 'controller/shop.js', 'controller/product.js', 'controller/event.js', 'controller/coupounCode.js', 'controller/order.js', 'controller/withdraw.js'],
+};
+
+const specs = swaggerJsdoc(options);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Get the directory name using import.meta.url
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

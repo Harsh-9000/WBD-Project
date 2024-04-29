@@ -1,3 +1,10 @@
+/**
+ * @swagger
+ * tags:
+ *   name: Shop
+ *   description: Shop management APIs
+ */
+
 import express from 'express';
 import { upload } from '../multer.js';
 import ErrorHandler from '../utils/ErrorHandler.js';
@@ -11,6 +18,64 @@ import { isAdmin, isAuthenticated, isSeller } from '../middleware/auth.js';
 import Shop from '../model/shop.js';
 
 const router = express.Router();
+
+/**
+ * @swagger
+ * /api/v2/shop/create-shop:
+ *   post:
+ *     summary: Create a new shop
+ *     description: Register a new shop with the provided information.
+ *     tags: [Shop]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *                 description: The avatar image of the shop
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Email address of the shop owner
+ *               name:
+ *                 type: string
+ *                 description: Name of the shop
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 description: Password for the shop owner
+ *               address:
+ *                 type: string
+ *                 description: Address of the shop
+ *               phoneNumber:
+ *                 type: string
+ *                 description: Phone number of the shop owner
+ *               zipCode:
+ *                 type: string
+ *                 description: Zip code of the shop location
+ *     responses:
+ *       '201':
+ *         description: Shop created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 message:
+ *                   type: string
+ *                   description: Success message
+ *       '400':
+ *         description: Bad request or shop already exists
+ *       '500':
+ *         description: Internal server error
+ */
 
 // create shop
 router.post(
@@ -118,6 +183,48 @@ router.post(
   })
 );
 
+/**
+ * @swagger
+ * /api/v2/shop/login-shop:
+ *   post:
+ *     summary: Login as a seller
+ *     description: Log in as a seller using email and password.
+ *     tags: [Shop]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Email address of the seller
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 description: Password of the seller
+ *     responses:
+ *       '201':
+ *         description: Seller logged in successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 token:
+ *                   type: string
+ *                   description: Authentication token for the logged-in seller
+ *       '400':
+ *         description: Bad request or seller not found
+ *       '500':
+ *         description: Internal server error
+ */
+
 // login shop
 router.post(
   '/login-shop',
@@ -150,6 +257,35 @@ router.post(
   })
 );
 
+/**
+ * @swagger
+ * /api/v2/shop/getSeller:
+ *   get:
+ *     summary: Get seller information
+ *     description: Retrieve information about the currently logged-in seller.
+ *     tags: [Shop]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Seller information retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 seller:
+ *                   type: object
+ *                   description: Information about the seller
+ *       '400':
+ *         description: Bad request or seller not found
+ *       '500':
+ *         description: Internal server error
+ */
+
 // load shop
 router.get(
   '/getSeller',
@@ -172,6 +308,31 @@ router.get(
   })
 );
 
+/**
+ * @swagger
+ * /api/v2/shop/logout:
+ *   get:
+ *     summary: Logout from seller account
+ *     description: Logout from the currently logged-in seller account.
+ *     tags: [Shop]
+ *     responses:
+ *       '201':
+ *         description: Seller logged out successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 message:
+ *                   type: string
+ *                   description: Logout success message
+ *       '500':
+ *         description: Internal server error
+ */
+
 // log out from shop
 router.get(
   '/logout',
@@ -191,6 +352,40 @@ router.get(
   })
 );
 
+/**
+ * @swagger
+ * /api/v2/shop/get-shop-info/{id}:
+ *   get:
+ *     summary: Get shop information by ID
+ *     description: Retrieve information about a shop by its ID.
+ *     tags: [Shop]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the shop to retrieve information about
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '201':
+ *         description: Shop information retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 shop:
+ *                   type: object
+ *                   description: Information about the shop
+ *       '400':
+ *         description: Bad request or shop not found
+ *       '500':
+ *         description: Internal server error
+ */
+
 // get shop info
 router.get(
   '/get-shop-info/:id',
@@ -206,6 +401,44 @@ router.get(
     }
   })
 );
+
+/**
+ * @swagger
+ * /api/v2/shop/update-shop-avatar:
+ *   put:
+ *     summary: Update shop avatar
+ *     description: Update the avatar image of the logged-in seller's shop.
+ *     tags: [Shop]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: The image file to be uploaded as the shop's new avatar
+ *     responses:
+ *       '200':
+ *         description: Shop avatar updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 seller:
+ *                   type: object
+ *                   description: Information about the updated shop
+ *       '500':
+ *         description: Internal server error
+ */
 
 // update shop profile picture
 router.put(
@@ -235,6 +468,55 @@ router.put(
     }
   })
 );
+
+/**
+ * @swagger
+ * /api/v2/shop/update-seller-info:
+ *   put:
+ *     summary: Update seller information
+ *     description: Update the information of the logged-in seller.
+ *     tags: [Shop]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: The new name of the seller/shop
+ *               description:
+ *                 type: string
+ *                 description: The new description of the seller/shop
+ *               address:
+ *                 type: string
+ *                 description: The new address of the seller/shop
+ *               phoneNumber:
+ *                 type: string
+ *                 description: The new phone number of the seller/shop
+ *               zipCode:
+ *                 type: string
+ *                 description: The new zip code of the seller/shop
+ *     responses:
+ *       '201':
+ *         description: Seller information updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 shop:
+ *                   type: object
+ *                   description: Information about the updated seller/shop
+ *       '500':
+ *         description: Internal server error
+ */
 
 // update seller info
 router.put(
@@ -268,6 +550,46 @@ router.put(
   })
 );
 
+/**
+ * @swagger
+ * /api/v2/shop/admin-all-sellers:
+ *   get:
+ *     summary: Get all sellers (for admin)
+ *     description: Fetch all sellers registered in the system. Only accessible by admin users.
+ *     tags: [Shop]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: The page number for paginated results (default: 1)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: The maximum number of results per page (default: 10)
+ *     responses:
+ *       '201':
+ *         description: List of sellers retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 sellers:
+ *                   type: array
+ *                   description: List of sellers
+ *                   items:
+ *                     $ref: '#/components/schemas/Shop'
+ *       '500':
+ *         description: Internal server error
+ */
+
 // all sellers --- for admin
 router.get(
   '/admin-all-sellers',
@@ -287,6 +609,42 @@ router.get(
     }
   })
 );
+
+/**
+ * @swagger
+ * /api/v2/shop/delete-seller/{id}:
+ *   delete:
+ *     summary: Delete a seller (for admin)
+ *     description: Delete a seller by ID. Only accessible by admin users.
+ *     tags: [Shop]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the seller to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '201':
+ *         description: Seller deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 message:
+ *                   type: string
+ *                   description: Message indicating successful deletion
+ *       '400':
+ *         description: Seller not found
+ *       '500':
+ *         description: Internal server error
+ */
 
 // delete seller ---admin
 router.delete(
@@ -315,6 +673,42 @@ router.delete(
   })
 );
 
+/**
+ * @swagger
+ * /api/v2/shop/update-payment-methods:
+ *   put:
+ *     summary: Update payment methods
+ *     description: Update payment methods for the current seller.
+ *     tags: [Shop]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               withdrawMethod:
+ *                 type: string
+ *                 description: The updated payment method
+ *     responses:
+ *       '201':
+ *         description: Payment methods updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 seller:
+ *                   $ref: '#/components/schemas/Seller'
+ *       '500':
+ *         description: Internal server error
+ */
+
 // update seller withdraw methods --- sellers
 router.put(
   '/update-payment-methods',
@@ -336,6 +730,32 @@ router.put(
     }
   })
 );
+
+/**
+ * @swagger
+ * /api/v2/shop/delete-withdraw-method:
+ *   delete:
+ *     summary: Delete withdraw method
+ *     description: Delete the withdraw method for the current seller.
+ *     tags: [Shop]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '201':
+ *         description: Withdraw method deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 seller:
+ *                   $ref: '#/components/schemas/Seller'
+ *       '500':
+ *         description: Internal server error
+ */
 
 // delete seller withdraw merthods --- only seller
 router.delete(

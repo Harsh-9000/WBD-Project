@@ -1,3 +1,9 @@
+/**
+ * @swagger
+ * tags:
+ *   name: Withdraw
+ *   description: Withdraw management APIs
+ */
 import express from 'express';
 import catchAsyncErrors from '../middleware/catchAsyncErrors.js';
 import ErrorHandler from '../utils/ErrorHandler.js';
@@ -9,6 +15,40 @@ import Shop from '../model/shop.js';
 
 const router = express.Router();
 
+
+/**
+ * @swagger
+ * /api/v2/withdraw/create-withdraw-request:
+ *   post:
+ *     summary: Create withdraw request
+ *     description: Allows sellers to create a withdraw request for the available balance.
+ *     tags: [Withdraw]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               amount:
+ *                 type: number
+ *                 description: The amount to withdraw
+ *     responses:
+ *       '201':
+ *         description: Successfully created withdraw request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 withdraw:
+ *                   $ref: '#/components/schemas/Withdraw'
+ *       '500':
+ *         description: Internal server error
+ */
 
 // create withdraw request --- only for seller
 router.post(
@@ -54,6 +94,34 @@ router.post(
   })
 );
 
+/**
+ * @swagger
+ * /api/v2/withdraw/get-all-withdraw-request:
+ *   get:
+ *     summary: Get all withdraw requests
+ *     description: Allows admins to retrieve all withdraw requests.
+ *     tags: [Withdraw]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '201':
+ *         description: Successfully retrieved all withdraw requests
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 withdraws:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Withdraw'
+ *       '500':
+ *         description: Internal server error
+ */
+
 // get all withdraws --- admnin
 
 router.get(
@@ -74,6 +142,48 @@ router.get(
   })
 );
 
+/**
+ * @swagger
+ * /api/v2/withdraw/update-withdraw-request/{id}:
+ *   put:
+ *     summary: Update withdraw request
+ *     description: Allows admins to update the status of a withdraw request.
+ *     tags: [Withdraw]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the withdraw request to update
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               sellerId:
+ *                 type: string
+ *                 description: ID of the seller associated with the withdraw request
+ *     responses:
+ *       '201':
+ *         description: Successfully updated withdraw request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the request was successful
+ *                 withdraw:
+ *                   $ref: '#/components/schemas/Withdraw'
+ *       '500':
+ *         description: Internal server error
+ */
 // update withdraw request ---- admin
 router.put(
   "/update-withdraw-request/:id",
