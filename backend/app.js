@@ -26,10 +26,6 @@ const options = {
         url: 'http://localhost:8000',
         description: 'Development server',
       },
-      {
-        url: 'https://wbd-project-client.vercel.app',
-        description: 'Deployment server',
-      }
     ],
   },
   apis: ['swagger-spec.js', 'controller/user.js', 'controller/shop.js', 'controller/product.js', 'controller/event.js', 'controller/coupounCode.js', 'controller/order.js', 'controller/withdraw.js'],
@@ -47,7 +43,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: 'https://wbd-project-client.vercel.app',
     credentials: true
   })
 );
