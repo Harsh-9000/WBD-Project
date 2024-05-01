@@ -13,36 +13,43 @@ import { isSeller, isAuthenticated, isAdmin } from "../middleware/auth.js";
 import Shop from "../model/shop.js";
 import Product from "../model/product.js";
 import Order from "../model/order.js";
-// import redis from "redis"
+import redis from "redis"
+import dotenv from "dotenv";
 
+dotenv.config()
+
+const redisPort = process.env.REDIS_PORT
+const redisHost = process.env.REDIS_HOST
+const redisPassword = process.env.REDIS_PASSWORD
 // let redisPort = 6379;
 // let redisHost = "127.0.0.1";
-// const client = redis.createClient({
-//   socket: {
-//     port: redisPort,
-//     host: redisHost,
-//   }
-// });
+const client = redis.createClient({
+  password: redisPassword,
+  socket: {
+    host: redisHost,
+    port: redisPort
+  }
+});
 
-// (async () => {
-//   await client.connect();
-// })();
+(async () => {
+  await client.connect();
+})();
 
-// console.log("Attempting to connect to redis");
-// client.on('connect', () => {
-//   console.log('Connected to Redis!');
-// });
+console.log("Attempting to connect to redis");
+client.on('connect', () => {
+  console.log('Connected to Redis!');
+});
 
-// client.on("error", (err) => {
-//   console.log(`Error:${err}`);
-// });
+client.on("error", (err) => {
+  console.log(`Error:${err}`);
+});
 
-// process.on('SIGINT', () => {
-//   client.quit();
-//   console.log('redis client quit');
-// });
+process.on('SIGINT', () => {
+  client.quit();
+  console.log('redis client quit');
+});
 
-// const DEFAULT_EXPIRATION = 3600;
+const DEFAULT_EXPIRATION = 3600;
 
 const router = express.Router();
 
@@ -298,32 +305,32 @@ router.get(
   "/get-all-products",
   catchAsyncErrors(async (req, res, next) => {
     try {
-      // const value = await client.get('products')
-      // if (value != null) {
-      //   const products = JSON.parse(value);
-      //   res.status(200).json({
-      //     success: true,
-      //     products,
-      //     message: "Products retrieved from cache.",
-      //   });
-      // } else {
-      //   const products = await Product.find().sort({ createdAt: -1 });
+      const value = await client.get('products')
+      if (value != null) {
+        const products = JSON.parse(value);
+        res.status(200).json({
+          success: true,
+          products,
+          message: "Products retrieved from cache.",
+        });
+      } else {
+        const products = await Product.find().sort({ createdAt: -1 });
 
-      //   client.SETEX("products", DEFAULT_EXPIRATION, JSON.stringify(products));
+        client.SETEX("products", DEFAULT_EXPIRATION, JSON.stringify(products));
 
-      //   res.status(200).json({
-      //     success: true,
-      //     products,
-      //     message: "Products retrieved from database and cached.",
-      //   });
-      // }
+        res.status(200).json({
+          success: true,
+          products,
+          message: "Products retrieved from database and cached.",
+        });
+      }
 
-      const products = await Product.find().sort({ createdAt: -1 });
-      res.status(200).json({
-        success: true,
-        products,
-        message: "Products retrieved from database and cached.",
-      });
+      // const products = await Product.find().sort({ createdAt: -1 });
+      // res.status(200).json({
+      //   success: true,
+      //   products,
+      //   message: "Products retrieved from database and cached.",
+      // });
     } catch (error) {
       return next(new ErrorHandler(error, 400));
     }
