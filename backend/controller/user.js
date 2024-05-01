@@ -288,9 +288,8 @@ router.get(
   catchAsyncErrors(async (req, res, next) => {
     try {
       res.cookie('token', '', {
-        expires: new Date(0), // Set expiration to a past date
-        httpOnly: true
-      });
+        expires: new Date(0),
+      })
       res.status(201).json({
         success: true,
         message: 'Log out successful!'
