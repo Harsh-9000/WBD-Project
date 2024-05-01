@@ -289,6 +289,7 @@ router.get(
     try {
       res.cookie('token', '', {
         expires: new Date(0),
+        secure: true,
         sameSite: "none"
       })
       res.status(201).json({
