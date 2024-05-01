@@ -85,7 +85,7 @@ router.post('/create-user', upload.single('file'), async (req, res, next) => {
     
     const firstName = name.split(' ')[0];
     const activationToken = createActivationToken(user);
-    const activationUrl = `https://wbd-project-client.vercel.app/activation/${activationToken}`;
+    const activationUrl = `https://wbd-project.onrender.com/activation/${activationToken}`;
     try {
       await sendMail({
         email: user.email,
