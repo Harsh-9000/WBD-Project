@@ -82,7 +82,7 @@ router.post('/create-user', upload.single('file'), async (req, res, next) => {
       password: password,
       avatar: fileUrl
     };
-    
+
     const firstName = name.split(' ')[0];
     const activationToken = createActivationToken(user);
     const activationUrl = `https://wbd-project.onrender.com/activation/${activationToken}`;
@@ -289,6 +289,7 @@ router.get(
     try {
       res.cookie('token', '', {
         expires: new Date(0),
+        sameSite: "none"
       })
       res.status(201).json({
         success: true,
