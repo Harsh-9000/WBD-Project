@@ -10,8 +10,21 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      # Change the working directory to where your package.json file is located
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      # Navigate to the frontend directory
+      - name: Navigate to frontend directory
+        run: cd frontend
+
+      # Install dependencies
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
+
+      # Continue with your existing steps for build and deployment
       # - run: |
       #    ng build --prod
       - uses: amondnet/vercel-action@v25 #deploy
@@ -21,4 +34,3 @@ jobs:
           vercel-args: '--prod' # Optional
           vercel-org-id: ${{ secrets.ORG_ID }}  # Required
           vercel-project-id: ${{ secrets.PROJECT_ID }} # Required 
-          working-directory: frontend
