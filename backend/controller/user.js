@@ -155,6 +155,8 @@ router.post(
  *   post:
  *     summary: Log in user
  *     description: Log in user with email and password.
+ *     security:
+ *       - bearerAuth: []
  *     tags: [User]
  *     requestBody:
  *       required: true

@@ -3,27 +3,21 @@ import express from 'express';
 import mongoose from 'mongoose';
 import Event from './model/event.js';
 import router from './controller/event.js';
-import FormData from "form-data"
-import fs from "fs"
-import path from "path"
 
 const app = express();
 app.use(express.json());
 app.use('/api/v2/event', router);
 
-// Use a different database for testing or clear the database after each test to keep it clean
 beforeAll(async () => {
   // Connect to the test database
   await mongoose.connect('mongodb://127.0.0.1:27017/test', {});
 });
 
 afterEach(async () => {
-  // Clear the database after each test
   await Event.deleteMany({});
 });
 
 afterAll(async () => {
-  // Close the database connection after all tests
   await mongoose.connection.close();
 });
 
