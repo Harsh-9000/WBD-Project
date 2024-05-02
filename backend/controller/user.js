@@ -309,7 +309,7 @@ router.get(
 
 /**
  * @swagger
- * /api/v2/user/update:
+ * /api/v2/user/update-user-info:
  *   put:
  *     summary: Update user information
  *     description: Update user information such as name, email, password, and phone number.
