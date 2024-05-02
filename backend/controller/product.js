@@ -481,11 +481,12 @@ router.get(
   isAuthenticated,
   isAdmin("Admin"),
   catchAsyncErrors(async (req, res, next) => {
+    console.log("challa");
     try {
       const products = await Product.find().sort({
         createdAt: -1,
       });
-      res.status(0).json({
+      res.status(201).json({
         success: true,
         products,
       });

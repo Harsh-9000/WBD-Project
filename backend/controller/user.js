@@ -59,7 +59,7 @@ router.post('/create-user', upload.single('file'), async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
     const userEmail = await User.findOne({ email });
-
+    console.log("after findOne");
     if (userEmail) {
       //deleting avater file so that the file didn't get created in uploads when user email is already register
       const filename = req.file.filename;
@@ -72,7 +72,7 @@ router.post('/create-user', upload.single('file'), async (req, res, next) => {
       });
       return next(new ErrorHandler('User already exists', 400));
     }
-
+    console.log("after photo delete");
     const filename = req.file.filename;
     const fileUrl = path.join(filename);
 
@@ -82,21 +82,24 @@ router.post('/create-user', upload.single('file'), async (req, res, next) => {
       password: password,
       avatar: fileUrl
     };
-
+    console.log("after user create");
     const firstName = name.split(' ')[0];
     const activationToken = createActivationToken(user);
-    const activationUrl = `https://wbd-project.onrender.com/activation/${activationToken}`;
+    const activationUrl = `https://wbd-project-client.vercel.app/activation/${activationToken}`;
+    console.log("after activation");
     try {
       await sendMail({
         email: user.email,
         subject: 'Activate your account',
         message: `Hello ${firstName}, please click on the link to activate your account: ${activationUrl}`
       });
+      console.log("after mail");
       return res.status(201).json({
         success: true,
         message: `please check your email:- ${user.email} to activate your account!`
       });
     } catch (error) {
+      console.log("after mail error");
       return next(new ErrorHandler(error.message, 500));
     }
   } catch (error) {
