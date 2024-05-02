@@ -340,7 +340,8 @@ router.get(
     try {
       res.cookie('seller_token', null, {
         expires: new Date(0),
-        httpOnly: true
+        secure: true,
+        sameSite: "none"
       });
       res.status(201).json({
         success: true,
