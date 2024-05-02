@@ -114,7 +114,7 @@ router.post(
 
       const firstName = name.split(' ')[0];
       const activationToken = createActivationToken(seller);
-      const activationUrl = `https://wbd-project-client.vercel.app/activation/${activationToken}`;
+      const activationUrl = `https://wbd-project-client.vercel.app/seller/activation/${activationToken}`;
 
       try {
         await sendMail({
