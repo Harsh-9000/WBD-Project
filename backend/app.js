@@ -50,19 +50,19 @@ app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 app.use(morgan('common'));
 app.use(express.json());
 app.use(cookieParser());
-// app.use(
-//   cors({
-//     origin: 'https://wbd-project-client.vercel.app',
-//     credentials: true
-//   })
-// );
-
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: 'https://wbd-project-client.vercel.app',
     credentials: true
   })
 );
+
+// app.use(
+//   cors({
+//     origin: 'http://localhost:3000',
+//     credentials: true
+//   })
+// );
 app.use('/', express.static(path.join(__dirname, './uploads')));
 app.use('/test', (req, res) => {
   res.send('Hello world!');
